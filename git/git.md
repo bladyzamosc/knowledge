@@ -1,4 +1,6 @@
-### 1. Change author of all commits
+## GIT
+
+### 1. Change the author of all commits
 
 `git filter-branch -f --env-filter "
 GIT_AUTHOR_NAME='bladyzamosc'

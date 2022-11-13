@@ -1,3 +1,5 @@
+## Spring transactions
+
 ### 1. Transaction kinds 
 
 - Global - EJB CMT  container manager transaction, for more resources 
