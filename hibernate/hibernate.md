@@ -18,3 +18,46 @@ public class Store {
            inverseJoinColumns = { @JoinColumn(name = “fk_product”) })
     private Set<Product> products = new HashSet<Product>();
 }`
+
+### 3. EntityManager -> Session
+
+There is 'unwrap' method
+
+`Session session = em.unwrap(Session.class);`
+
+`SessionFactory sessionFactory = em.getEntityManagerFactory()
+.unwrap(SessionFactory.class);`
+
+### 4. @Column
+
+`@Column(name = "created_at", updatable = false) `
+
+`private LocalDateTime createdAt;`
+
+`@Column(name = "updated_at", insertable = false)`
+
+`private LocalDateTime updatedAt;`
+
+- updatable
+- insertable
+- nullable
+
+### 5. Dates
+
+- java.util.Date and java.util.Calendar are always mapped to SQL TIMESTAMP with nanoseconds
+- @Temporal - @Temporal(TemporalType.DATE) private Date date
+
+### 6. Enums
+
+- @Enumerated(EnumType.ORDINAL) and @Enumerated(EnumType.STRING)
+- AttributeConverter - to define own mapping
+
+### 7. ID Generation type
+
+- AUTO - base on the types (numerical or UUID)
+- IDENTITY - rely on database, auto-incremented, disables batch updates 
+- SEQUENCE - switches to table generation id database does not support it. 
+- TABLE - uses database table that holds segments of identifier generation values. It selects and updates sequence in order to next insert a record. That is not efficient comparing sequence or identity options.
+
+Almost all modern databases support sequences or auto-incremented columns that generate
+primary key values more efficiently than the table strategy described in this tip.
