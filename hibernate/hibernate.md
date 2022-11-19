@@ -61,3 +61,107 @@ There is 'unwrap' method
 
 Almost all modern databases support sequences or auto-incremented columns that generate
 primary key values more efficiently than the table strategy described in this tip.
+
+### 8. @Immutable
+
+- update not on entity allowed
+
+### 9. Converter 
+
+`@Converter(autoApply = true)`
+
+`public class AuthorStatusConverter implements AttributeConverter<AuthorStatus, String>`
+
+### 10. Generation time 
+
+`@Column`
+
+`@Generated(GenerationTime.ALWAYS)`
+
+`private LocalDateTime lastUpdate;`
+
+### 11. @Formula
+
+`@Column private LocalDate dateOfBirth;`
+
+`@Formula(value = "date_part('year', age(dateOfBirth))") private int age;`
+
+- downside - Hibernate executes it evry time data is fetched from the DB.
+
+### 12. @Transient
+
+- ignoring in reading and writing the enrity
+
+### 13.@PrePersist and @PreRemove
+
+- before save the method annotated by @PrePersist is will be executed
+
+### 13. @OrderBy
+
+- order in which associated enities shall be retrieved 
+- @OrderBy(value = "lastName ASC")
+
+### 14. Many-to-many
+
+- midle table entity
+- @Embeddable
+
+### 15. Inheritance
+
+- @MappedSuperclass - mapping from superclass, not from @Entity
+- @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+- @Inheritance(strategy = InheritanceType.JOINED)
+- @Inheritance(strategy = InheritanceType.SINGLE_TABLE), @DiscriminatorColumn on subclass
+
+
+### 16. Optional 
+
+![img.png](img.png)
+
+### 17. Logging
+
+`<property name="hibernate.format_sql" value="true" />`
+
+`<property name="hibernate.generate_statistics" value="true" />`
+
+`<property name="hibernate.use_sql_comments" value="true" />`
+
+### 18. Typed query
+
+![img_1.png](img_1.png)
+
+### 19. JOIN FETCH
+
+- can initialize lazy relations and prevents LazyInitializationException outside transaction
+- @NamedEntityGraph and join fetch can prevent n+1 issue
+
+### 20. JPQL functions 
+
+- upper(s)
+- lower(s)
+- current_date()
+- current_time()
+- current_timestamp()
+- substring()
+- trim()
+- length()
+- abs()
+- sqrt()
+- mod()
+- size()
+
+### 21. Pagination
+
+- setMaxResults
+- serFirstResult
+
+### 22. Deleting
+
+- by query - DELETE FROM exampleTable
+
+### 23. Native query
+
+- @NamedNativeQuery
+
+
+
