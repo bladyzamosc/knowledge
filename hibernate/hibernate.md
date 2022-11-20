@@ -163,5 +163,9 @@ primary key values more efficiently than the table strategy described in this ti
 
 - @NamedNativeQuery
 
+### 24. Cache
 
+- shared-cache-mode - NONE, ENABLE_SELECTIVE, DISABLE_SELECTIVE, ALL
+- @Cacheable and @Cache(hibernate)
+- Hibernate does not use the second-level cache with JPQL and CriteriaQuery
 
