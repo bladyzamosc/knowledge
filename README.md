@@ -9,6 +9,9 @@ This is my private base with tips
 [Docker](docker/docker.md)
 
 [Spring core](spring/spring-core.md)
+
+[Spring aop](spring/spring-aop.md)
+
 [Spring transactions](spring/spring-transactions.md)
 
 [Hibernate](hibernate/hibernate.md)
