@@ -87,3 +87,7 @@ ClassPathApplicationXmlContext, AnnotationConfigWebApplicationContext, WebXmlApp
 ### 13. Inner bean
 
 - is bean is used as a property of another
+
+### 14. @SpringBootApplication
+
+@SpringBootConfiguration + @ComponentScan  + @EnableAutoConfiguration

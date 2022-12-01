@@ -17,3 +17,5 @@ This is my private base with tips
 [Hibernate](hibernate/hibernate.md)
 
 [Various](various/various.md)
+
+[Migration 8 to 17](various/migration_8_to_17.md)
