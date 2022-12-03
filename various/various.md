@@ -30,3 +30,38 @@ class RecommenderImplementationMockTest{
 </code>
 
 - @SpringBootTest - for test lauching context 
+
+### 3. try with resources
+
+java.lang.AutoCloseable - must be implemented
+
+### 4. java.util.Arrays
+
+- asList
+- search - binarySearch, 
+- compare, compareUnassigned, 
+- copyOf, copyOfRange
+- deepEquals
+- deepHashCode
+- fill
+- mismatch
+- parallelSort, sort
+
+### 5. java.util.Collections 
+
+- asLifoQueue
+- binarySearch
+- copy
+- emptyXXX
+- fill
+- list 
+- max, min
+- reverse
+- rotate
+- singleton, singletonList
+- swap
+- synchronizedXXX, unmodifiableXXX
+
+### 6. java.util.Objects
+
+- isNull, isNotNull
