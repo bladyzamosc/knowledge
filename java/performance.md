@@ -75,5 +75,9 @@ JVM memory = Heap + Metaspace + CodeCache + (ThreadSize x numberOfThreads) + Dir
 - Shenandoah
 1. also a very short pause time, GC concurrent to app, well siuted to applications that needs
 
+### 6. What is NUMA-aware in G1
 
-
+- Non-Uniform Memory Access
+- memory access depends on the memory location relative to processor and for processor local memory access is faster and to non-local memory.
+- local memory access takes 30-60 less than non-local memory
+- ZGC supports, JDK-6 added it to Parallel, 
