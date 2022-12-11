@@ -31,3 +31,7 @@ docker rm 789b
 docker ps -a
 
 docker run -d -p 8085:80 nginx // listen on 8095 port and route it to 80
+
+docker volume ls
+
+docker volume prune
