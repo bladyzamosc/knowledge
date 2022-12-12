@@ -50,14 +50,15 @@ There is 'unwrap' method
 ### 6. Enums
 
 - @Enumerated(EnumType.ORDINAL) and @Enumerated(EnumType.STRING)
+- Ordinal = default
 - AttributeConverter - to define own mapping
 
 ### 7. ID Generation type
 
-- AUTO - base on the types (numerical or UUID)
-- IDENTITY - rely on database, auto-incremented, disables batch updates 
+- AUTO - base on the types (numerical or UUID), persistence provider decides here, hibernate decides by dialect and for most DBs it is sequence
+- IDENTITY - rely on database, auto-incremented, disables batch updates,
 - SEQUENCE - switches to table generation id database does not support it. 
-- TABLE - uses database table that holds segments of identifier generation values. It selects and updates sequence in order to next insert a record. That is not efficient comparing sequence or identity options.
+- TABLE - uses database table that holds segments of identifier generation values. It selects creating lock and updates sequence in order to next insert a record. That is not efficient comparing sequence or identity options.
 
 Almost all modern databases support sequences or auto-incremented columns that generate
 primary key values more efficiently than the table strategy described in this tip.
@@ -150,7 +151,7 @@ primary key values more efficiently than the table strategy described in this ti
 - mod()
 - size()
 
-### 21. Pagination
+### 21. Pagination - by offset and limit only
 
 - setMaxResults
 - serFirstResult
@@ -168,4 +169,45 @@ primary key values more efficiently than the table strategy described in this ti
 - shared-cache-mode - NONE, ENABLE_SELECTIVE, DISABLE_SELECTIVE, ALL
 - @Cacheable and @Cache(hibernate)
 - Hibernate does not use the second-level cache with JPQL and CriteriaQuery
+
+### 25. FetchTypes
+
+- FetchTypes.Lazy - default in to-many
+- FetchTypes.Eager - default in to-one
+
+### 26. N+1
+
+- SELECT FROM Order o JOIN FETCH o.items i - join fetch 
+- entityGraph
+
+### 27. Native query 
+
+- em.createNativeQuery
+- paramter queries - no sql injections, automate type mapping, allows addtional optimization
+- positional parameters available. but named parameters not
+- @SqlResultSetMappings - mapping sql results on the entity
+- mapping 
+
+### 28. Logging
+
+ - org.hibernate - all
+ - org.hibernate.stat - statistics
+ - org.hibernate.cache - 2nd level cache
+ - org.hibernate.SQL - executed SQLs, debug for dev and error for prod,
+ - org.hibernate.type.descriptor.sql - bind parameters values
+
+### 29. EM -> SF
+
+- Session session = em.unwrap(Session.class)
+- SessionFactory = em.getEntityManagerFactory.unwrap(SessionFactory.class)
+
+### 30. Tips 
+
+- do not use unidirectional one-to-many associations
+- CascadeType.Remove - to many removals, use orphanRemoval, removal in bulk
+- FetchType.LAZY for @ManyToOne
+- MultipleBagFetchException  - when you are trying to fetch many bag in one query 
+- @ManyToMany - use set, not list
+- ZonedDateTime - supported from 5, hibernate.jdbc.time.zone on UTC
+- @EitherOr
 
