@@ -8,6 +8,8 @@ This is my private base with tips
 
 [Docker](docker/docker.md)
 
+[Kubernetes](kubernetes/kubernetes.md)
+
 [Spring core](spring/spring-core.md)
 
 [Spring aop](spring/spring-aop.md)
@@ -20,5 +22,5 @@ This is my private base with tips
 
 [Migration 8 to 17](various/migration_8_to_17.md)
 
-[Databases](db/mongo.md)
+[Databases - mongo](db/mongo.md)
 
