@@ -1,8 +1,9 @@
 ## Kubernetes 
 
-### 1. kubectl
+### 1. Glossary and tools
 
-The tool for helping manage the Kubernetes cluster and application.
+- kubectl - The tool for helping manage the Kubernetes cluster and application.
+- kubelet - kubernetes agent
 
 ### 2. Kubernetes
 
@@ -14,3 +15,36 @@ Kubernetes is an orchestrator of cloud-native microservices applications.
 - self-heal
 - suppot zero-downtime tolling updates 
 - run anywhere that has Kubernetes - AWS, Azure, Linode, your on-premises datacenter, or even your Raspberry Pi cluster at home.
+
+### 4. Masters and nodes 
+
+- masters - host control pane
+- nodes run user applications
+
+### 5. Commands 
+
+- kubectl get nodes
+- export KUBECONFIG=/usecode/config
+- kubectl apply -f pod.yml
+- kubectl get pods
+- kubectl port-forward --address 0.0.0.0 first-pod 8080:8080
+
+### 6. Pod
+
+- wrapper around the container 
+- container runs inside the pod
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-pod
+  labels:
+    project: example-app
+spec:
+  containers:
+    - name: bladyzamosc-app
+      image: bladyzamosc/example-app:1.0
+      ports:
+        - containerPort: 8080
+```
