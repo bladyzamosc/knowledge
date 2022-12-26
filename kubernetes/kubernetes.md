@@ -28,6 +28,7 @@ Kubernetes is an orchestrator of cloud-native microservices applications.
 - kubectl apply -f pod.yml
 - kubectl get pods
 - kubectl port-forward --address 0.0.0.0 first-pod 8080:8080
+- kubectl describe pod first-pod
 
 ### 6. Pod
 
@@ -47,4 +48,20 @@ spec:
       image: bladyzamosc/example-app:1.0
       ports:
         - containerPort: 8080
+```
+
+ - service
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloud-lb
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    project: bladyzamosc-app
 ```
