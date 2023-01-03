@@ -34,7 +34,11 @@ Kubernetes is an orchestrator of cloud-native microservices applications.
 
 - wrapper around the container 
 - container runs inside the pod
+- each pod has 1 and more containers
+- Pods are atomic units for scheduling - 10 replicas of our application, we would create 10 pods instead of creating one pod with 10 containers
+- basic building block and the atomic unit of scheduling in Kubernetes
 
+**Manifest**
 ```
 apiVersion: v1
 kind: Pod
@@ -50,7 +54,12 @@ spec:
         - containerPort: 8080
 ```
 
- - service
+### 7. Multicontainer pods 
+
+- pods are very similar to containers,but we can have any containers working inside a pod
+- pod is a wrapper for a group of containers
+
+### 8. Service
 
 ```
 apiVersion: v1
