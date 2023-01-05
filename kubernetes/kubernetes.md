@@ -34,6 +34,8 @@ Kubernetes is an orchestrator of cloud-native microservices applications.
 - kubectl exec -it nginx -- bash // start bash
 - kubectl delete pod nginx // killing pods
 - kubectl delete -f nginx.yaml // killing pods 
+- kubectl rollout undo deployment hellok8s
+
 
 ### 6. Pod
 
@@ -65,9 +67,26 @@ spec:
 - pods are very similar to containers,but we can have any containers working inside a pod
 - pod is a wrapper for a group of containers
 
-### 8. Service
+### 8. Services
+
+- provides a stable enpoint for pods
+- it is something, which sits in front of pods and takes care of receibing requires and delivering them to all pods that are behind it
+- NodePort will open a port on the woeker node to reveive requests (similary to port-forward)
 
 ```
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloud-lb
+spec:
+  type: NodePort
+  ports: // wea open the port 30001 and send it to 4567
+  - port: 4567
+    nodePort: 30001 
+  selector:
+    project: bladyzamosc-app
+    
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -80,6 +99,35 @@ spec:
   selector:
     project: bladyzamosc-app
 ```
+
+**Service types**
+- ClusterIP - default, we only need to give other applications that are running inside our cluster access to our pods. 
+
+```
+pod A -> Service -> pod B 1
+                 -> pod B 2
+                 -> pod B 3
+```
+
+- NodePort - extension for ClusterIP, but additionally allowing application that in our cluster to talk to each of each other, it will also allow us to expose our application to the outside world. It works by opening a port on all the worker nodes we have in our cluster, and then redirecting requests received on that port to the correct location, even if the pod we are trying to reach is physically running on a different node
+- LoadBalancer - extension for NodePort, provision a Load Balancer on the cloud provider we are running, for example it will createt ELB if cloud provider is AWS
+- External name
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  type: ExternalName
+  externalName: baza.bladyzamosc.com
+```
+
+**DNS**
+
+- works out of the box
+- any type of service
+- its preffered for service discovery mechanism
 
 ### 9. Deployments
 
@@ -156,3 +204,39 @@ spec:
 
 - rollingUpdate - is default strategy - during some period it will be 2 version of the application 
 - recreate - all pods will be terminated and pods with a new version will be created
+- livenessProbe - 
+- readinessProbe - 
+
+
+### 13. Ingress
+
+- for exposing http routes 
+- ingress sits before services and based on rules the request will be sent
+- ingress controller - azure ingress controller
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bladyzamosc-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /one
+            pathType: Prefix
+            backend:
+              service:
+                name: service-one
+                port:
+                  number: 1234
+          - path: /two
+            pathType: Prefix
+            backend:
+              service:
+                name: service-two
+                port:
+                  number: 4567
+```
