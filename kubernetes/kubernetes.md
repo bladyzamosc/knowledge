@@ -240,3 +240,54 @@ spec:
                 port:
                   number: 4567
 ```
+
+### 14. Config map
+
+- ConfigMaps can be used for configuration instead of defining in the docker image
+- one-by-one or use envFrom to get all the variables from a ConfigMap
+- prefix property for avoiding variables conflicts.
+- ConfigMaps can also be mounted as files in the container
+
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bladyzamosc-config
+data:
+  MESSAGE: "It works with a ConfigMap!"
+  
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bladyzamosc
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: bladyzamosc
+  template:
+    metadata:
+      labels:
+        app: bladyzamosc
+    spec:
+      containers:
+      - image: bladyzamosc/example:v2
+        name: bladyzamosc-container
+        env:
+          - name: MESSAGE
+            valueFrom:
+              configMapKeyRef:
+                name: bladyzamosc-config
+                key: MESSAGE
+```
+
+## 15. Secrets
+
+- similar to configMaps
+- only distributed to nodes that are running a pod that needs them
+- never written to physical storage
+- in the master they are encrypted 
+- reading a SECRET we are getting base64 encoded 
+- configMapKeyRef in ConfigMap and here secretKeyRef, secretRef
+- stringData - if we anoyed of base64
+- mounting similar like in ConfigMaps
