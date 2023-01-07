@@ -338,3 +338,48 @@ metadata:
   kubectl get all --all-namespaces
   kubectl apply -f bladyzamosc-pod.yaml -n my-namespace
 ```
+
+### 18. Resources 
+
+- Containers without resource limits can affect other applications sharing the same worker node
+- CPU - compressible resource, which means Kubernetes can just stop giving that specific container CPU time if a container tries to acquire more CPU than it should
+- memory - is containers tries to allocate more that it can Kubernetes will kill the process and depending on restart policy do the job
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bladyzamosc
+spec:
+  containers:
+  - name: bladyzamosc-container
+    image: bladyzamosc
+    command: ["dd", "if=/dev/zero", "of=/dev/null"]
+    resources:
+      requests:
+        cpu: 500m
+        memory: 5Mi
+      limits:
+        cpu: 500m
+        memory: 10Mi
+```
+
+- requests - this means 1/2 of single CPU core and 5MB of memory
+- limits - limited to 1/2 of CPU core 
+- LimitRange - cna be applied to namespace (kubectl apply -f default-limit-range.yaml)
+
+```
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: memory-limit-range
+spec:
+  limits:
+  - default:
+      memory: 500Mi
+      cpu: 200m
+    defaultRequest:
+      memory: 100Mi
+      cpu: 100m
+    type: Container
+```
