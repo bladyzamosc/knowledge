@@ -24,3 +24,5 @@ This is my private base with tips
 
 [Databases - mongo](db/mongo.md)
 
+[Databases - postgresql](db/postgresql.md)
+
