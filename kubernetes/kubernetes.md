@@ -281,7 +281,7 @@ spec:
                 key: MESSAGE
 ```
 
-## 15. Secrets
+### 15. Secrets
 
 - similar to configMaps
 - only distributed to nodes that are running a pod that needs them
@@ -291,3 +291,34 @@ spec:
 - configMapKeyRef in ConfigMap and here secretKeyRef, secretRef
 - stringData - if we anoyed of base64
 - mounting similar like in ConfigMaps
+
+
+### 16. Running jobs
+
+- Job is a resource that will create pods, will manage them and exit successfully if this will be required. When all pods will be completed job will be marked as completeted too.
+- restart policy - when pod should be restarted - always (default, it will be restarted indepedently on success or failure), onFailure (only if fails), never
+- pod will not be deleted after exits and that let to inspect it
+- ttlSecondsAfterFinished - after how many seconds job will be automatically deleted
+- completions (default = 1) - it will create 4 pods in row one ofter another 
+- parallelism - changes behaviour of above letting to run 2 pods at the same time
+- backoffLimit (default = 6) - it will keep retrying 10 times, still using an exponential back-of delay each retry 
+- activeDeadlineSeconds - how long job is allowed to run, after that job will fail
+- schedule + kind: ChronJob - (e.g. "* * * * *" - every minute) - letting define chron job 
+
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bladyzamosc-job
+spec:
+  parallelism: 2
+  completion: 4
+  backoffLimit: 10
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: bladyzamosc
+        image: bladyzamosc
+        command: ["hello", "Running in a bladyzamosc job"]
+```
