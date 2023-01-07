@@ -322,3 +322,19 @@ spec:
         image: bladyzamosc
         command: ["hello", "Running in a bladyzamosc job"]
 ```
+
+### 17. Namespaces 
+
+```
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bladyzamosc-namespace
+  
+  kubectl apply -f namespace.yaml
+  kubectl get namespaces
+  
+  kubectl get pods --all-namespaces
+  kubectl get all --all-namespaces
+  kubectl apply -f bladyzamosc-pod.yaml -n my-namespace
+```
