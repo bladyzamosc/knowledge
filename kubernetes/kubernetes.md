@@ -383,3 +383,39 @@ spec:
       cpu: 100m
     type: Container
 ```
+
+### 19. Config
+
+- clusters 
+- users - how we are going to authenticate against cluster
+- contexts - combination of cluster and users 
+
+```
+apiVersion: v1
+kind: Config
+current-context: docker-for-desktop
+
+clusters:
+- cluster:
+    insecure-skip-tls-verify: true
+    server: https://localhost:6443
+  name: docker-for-desktop-cluster
+
+users:
+- name: docker-for-desktop
+  user:
+    client-certificate-data: LS0tL...
+    client-key-data: LS0tL...
+
+contexts:
+- context:
+    cluster: docker-for-desktop-cluster
+    user: docker-for-desktop
+  name: docker-for-desktop
+  
+  
+  kubectl config current-context
+  kubectl config use-context production
+  kubect get pods --context production
+  kubectl --kubeconfig="path/to/config" get pods
+```
