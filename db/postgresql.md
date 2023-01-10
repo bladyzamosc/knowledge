@@ -138,5 +138,35 @@ postgres=# explain (costs off) select * from t where a <= 40000;
 #### GIN
 #### BRIN
 
+### 3. Proces and memory
 
-### 3.
+- postgres server process (earlier called as postmaster)- a parent of all processes; allocates shared memory; starts background processes and replication associated process; listens 5432 
+- backend process - handles all queries and statements from connected clients; communicated with the clined using TCP connection; operatas only on one database, allows multiple clients connected simultaneously (max_connections - default = 100)
+- Background Processes
+  - background writer - dirty pages on the shared buffer pool are written to a persistent storage
+  - checkpointer
+  - autovacuum launcher - t requests to create the autovacuum workers to the postgres server
+  - WAL writer - writes and flushes periodically the WAL data on the WAL buffer to persistent storage
+  - statistic collector - statistics information such as for pg_stat_activity and for pg_stat_database, etc. is collected
+  - logging collector - logs into files
+  - archiver - archiving logging is executed
+- replication process for streaming replication
+- background worker process - implemented by users 
+
+```
+pstree -p 9687
+```
+
+**Memory**
+
+- local memory area - for each backend process
+  - work_mem - Executor uses this area for sorting tuples by ORDER BY and DISTINCT operations, and for joining tables by merge-join and hash-join operations.
+  - maintenance_work_mem - maintenance operations like VACUUM, REINDEX
+  - temp_buffers - for storing temporary tables
+- shared memory are - used by all processes
+  - shared buffer pool	- for loading pages of tables and indexes from a persistent storage to this pool
+  - WAL buffer - WAL data - XLOG records - transaction log; WAL buffer is a buffering area of the WAL data before writing to a persistent storage
+  - commit log	- Commit Log - CLOG - keeps the states of all transactions (in_progress,committed,aborted) used by Concurrency Control (CC) mechanism
+  - Sub-areas for the access control mechanisms. (e.g., semaphores, lightweight locks, shared and exclusive locks, etc)
+  - Sub-areas for the background processes
+  - Sub-areas for transaction processing such as save-point and two-phase-commit.
