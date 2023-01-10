@@ -170,3 +170,42 @@ pstree -p 9687
   - Sub-areas for the access control mechanisms. (e.g., semaphores, lightweight locks, shared and exclusive locks, etc)
   - Sub-areas for the background processes
   - Sub-areas for transaction processing such as save-point and two-phase-commit.
+
+### 4. Query processing
+
+- parser - text -> parse tree, not checking for example table existence, while is checks on semantics
+- analyzer/analyzer - semantic analysis and parse tree -> query tree; checks semantics; relies on metadata in parsenodes.h
+- rewriter - query tree -> rules -> query tree; rules comes from pg_rules
+- planner - generates plan tree which can in the most effective way executor query tree; plan is created on pure const-based optimization, bit not hints and rule optinizations
+- executor - executes query plan accessing tables and indexes
+
+### 5. Const estimation
+
+- consts are estimated by the function in costsize.c and all operations executed by the executor have corresponding const functions, for example cost_seqscan() and cost_index(
+- cost start-up - cost expected before the firs tuple is fetched - index scan
+- cost run - cost of fetch all tuples
+- cost total - sum of above two
+- explain command shows for example "Seq Scan on tbl  (cost=0.00..145.00 rows=10000 width=8)" where 0 - start-up and 145 is total
+- sequential scan (f=cost_seqscan()) 
+  - here start-up = 0
+  - run cost = cpu run cost + disc run cost = (cpu_tuple_cost + cpu_operator_cost) x Ntuple + seq_page_cost x Npage
+  - here seq_page_cost (1.0), cpu_operator_cost (0.0025) and cpu_tuple_cost (0.01) are set in postgresql.conf
+  - Ntuple and Npage are number of typles and pages respectively
+  - for example with 10000 typles and 45 pages the 'run cost' = (0.01+0.0025) x 10000 + 1.0x45 = 170.0, and total = 0 + 170.0 = 170.0
+- index scan (f=cost_index()) - Nindex,tuple =10000 and Nindex,page =30
+  - start-up - is a cost of reading index pages to access the first tuple
+  - start-up cost = {ceil(log2(Nindex,tuple) + (Hindex + 1) x 50} x cpu_operator_cost ,where Hindex is a high of index tree
+  - start-up cost = {ceil(log2(10000) + (1+1) x 50} x 0.0025 - 0.285
+  - run-cost - is a sum of cpu and IO cost of both table and index
+  - run-cost = (index cpu cost + table cpu cost) + (index IO cost + table IO cost)
+    - index cpu cost = selectivity x Nindex,tuple x (cpu_index_tuple_cost +qual_op_cost), where cpu_index_tuple_cost = 0.005 and qual_op_cost=0.0025, selectivity = is a proportion of the search range of the index by specified WHERE clause
+    - table cpu cost = selectivity Ntuple x cpu_tuple_cost
+    - index IO cpu = ceil(selectivity x Nindex,tuple) + random_page_cost, where random_page_cost is = 4.0 
+- random_page_cost is equal to 4 for HDD it makes sens, but the cost on SSD is smaller, so if postgres works on SSD we should use 1.0 instead of 4.0
+- sort  (f=cost_sort())
+  - if all tuples to be sorted can be sorted in work_mem and quicksort is used
+  - otherwise temporary file is created and merge sort is used
+  - start-up cost - cost of sorting target tuples - O(Nsort x log2(Nsort)) ,where Nsort is number of tuples to be sorted 
+  - run cost is a cost of reading tuples = O(Nsort)
+  - start-up cost = C + comparison_cost x Nsort x N logx(Nsort), where C is a total cost of last scan
+  - run cost = cpu_opertor_cost x Nsort
