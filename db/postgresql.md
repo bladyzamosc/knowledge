@@ -209,3 +209,51 @@ pstree -p 9687
   - run cost is a cost of reading tuples = O(Nsort)
   - start-up cost = C + comparison_cost x Nsort x N logx(Nsort), where C is a total cost of last scan
   - run cost = cpu_opertor_cost x Nsort
+
+### 6. Plan
+
+- Carry out preprocessing
+- estimating the cost and getting the cheapest access path
+- create a plan from the cheapest path
+
+- access path is definied in the Path structure in  relation.h
+- the planner generates a plan tree from the cheapest path
+
+### 7. Executor
+
+- single table queries - the executor takes thew plan nodes in an order from the end of the plan tree to the root and then invokes the functions that perform the processing of the corresponding nodes
+- "Sort Method: external sort  Disk: 10000kB" - means that executor used temp file with 10MB size
+
+### 8. Join operators 
+ 
+- nested loop join
+  - default
+    - does not need start-up operation
+    - run-cost is proportional to the product of the size of the outer and inner tables - O(Nouter x Ninner); cost is always estimated
+  - materialized 
+    - reduces scanning of inner tables comparing to default, and thus reduces the total cost
+    - before  running nested loop join the executor writes the inner table tuples  to the work memoryot temp file 
+  - indexed
+    - index searching is used when index is created on the column in join condition and index scanning instead of sequential one is used 
+  - other variations 
+    - an existence of an index of the outer table and its attributes are involved in the join condition, it can be used for the index scanning instead of the sequential scan of the outer table
+- merge join
+  - default
+    - can be used only in natural joins (It automatically matches and combines rows from the tables with the same name of the columns;SELECT * FROM students NATURAL JOIN courses) and equi-joins (It is essentially a type of inner join where the join condition is based on equality - SELECT * FROM students JOIN courses ON students.course_id = courses.course_id;)
+    - start-up cost - is a sum of sorting cost on both innet and outer sorts
+    - in this case all tuples are stored in the memory and the sorting operation will be able to be carried out in the memory itself ( as in temp files)
+  - materiazed
+    - same as in materialized nested loop join where inner tuples are located in the memory or temp files
+  - other based on idexes
+- hash join
+  - similarly to merge join can be used only with natural and equi-joins
+  - behaves differently dependly on the size of tables; If the target table is small enough (more precisely, the size of the inner table is 25% or less of work_mem), it will be a simple two-phase in-memory hash join; otherwise, the hybrid hash join is used with the skew method
+  - in-memory hash join
+    - processed in work_mem and hash table are is called batch, which has buckets (number is always 2 POWER n)
+    - it has 2 phases - build (all tuples of the inner table are inserted into the batch) and probe (each tuple from outer is compared with inner tuples in the batch)
+  - Hybrid Hash Join with Skew
+    - it used when inner table tuples cannot be stored in the work_mem
+    - multiple batches are prepared where one is located in the work_mem and rest of them in temporary files
+    - here build and probes are perfored the same number times as number of batchs
+- all above can perform - inner join, left, right outer,full outer join 
+
