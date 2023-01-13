@@ -244,7 +244,7 @@ pstree -p 9687
     - in this case all tuples are stored in the memory and the sorting operation will be able to be carried out in the memory itself ( as in temp files)
   - materiazed
     - same as in materialized nested loop join where inner tuples are located in the memory or temp files
-  - other based on idexes
+  - other based on indexes
 - hash join
   - similarly to merge join can be used only with natural and equi-joins
   - behaves differently dependly on the size of tables; If the target table is small enough (more precisely, the size of the inner table is 25% or less of work_mem), it will be a simple two-phase in-memory hash join; otherwise, the hybrid hash join is used with the skew method
@@ -257,3 +257,52 @@ pstree -p 9687
     - here build and probes are perfored the same number times as number of batchs
 - all above can perform - inner join, left, right outer,full outer join 
 
+### 9. FWD - Foreign Data Wrappers
+
+- accessing foreing servers on remote servers 
+- possible to execute joins operation from tables from different servers 
+
+### 10. Concurrency control
+
+- support atomicity and isolation (AI from ACID)
+
+**Techniques**
+
+- Multi-version Concurrency Control (MVCC)
+  - each write creates a new version of a data item while retaining the old version 
+  - reads - the system selects one of the version to ensure isolation of the individual transaction
+  - readers do not block writes and reverse
+  - Postresql use variation of MVCC = Snapshot Isolation (SI)
+- Strict Two-Phase Locking (S2PL)
+  - system blocks readers when a writer acquires an exclusive lock for the item 
+- Optimistic Concurrency Control (OCC)
+
+**SI**
+- Oracle SI - is implemenet by using rollback segments, when writing a new data item, the old version of the item is written to the rollback segment and subsequently the new item is overwritten to the data area
+- PostreSQL - a new data is inserted directly into relevant table page and during reading appropriate version is used to an individual transaction by applying visibility check rules
+- SI does not allow anomalies - dirty reads, non-repeatable reads, phantom reads.
+- full serialization cannot be achived either because it alows anomalies like write skew and readonly transaction skew 
+- write skew - multiple transactions attempt to update the same piece of data simultaneously, resulting in conflicts or inconsistencies. This can occur in databases that use a multi-version concurrency control (MVCC) mechanism, where each transaction has its own view of the data and can make changes without being aware of other concurrent transactions.
+- readonly transaction skew - multiple read-only transactions attempt to access the same piece of data simultaneously, resulting in a performance degradation or inconsistencies
+
+**SSI - Serializable Snapshot Isolation**
+
+- detect the serialization anomalies and can resolve the conflicts caused by such anomalies
+
+**Transaction id**
+
+- a transaction begins a unique identifier is given by transaction manager (txid, 32-bit unassigned integer)
+- special txid 
+  - 0 - invalid
+  - 1 - bootstrap - for only init of DB
+  - 2 - frozen
+- txid space is insufficient (more than aprox 4,2 bilions) in practical systems, PostgreSQL treats the txid space as a circle
+
+**Tuple structure**
+
+- Heap tuples in table pages are classified as a usual data tuple and a TOAST tuple
+- fields 
+  - t_xmin - holds txid of transaction that inserted this tuple
+  - t_xmax - holds txid of transaction that deleted or updated this tuple (if nothing like that happened - 0/INVALID)
+  - t_cid - holds the commandId = how many SQL commands were invoked before this command within the current transaction starting from 0
+  - t_ctid - holds tuple id that points to itself or a new tuple 
