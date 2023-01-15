@@ -306,3 +306,45 @@ pstree -p 9687
   - t_xmax - holds txid of transaction that deleted or updated this tuple (if nothing like that happened - 0/INVALID)
   - t_cid - holds the commandId = how many SQL commands were invoked before this command within the current transaction starting from 0
   - t_ctid - holds tuple id that points to itself or a new tuple 
+
+- FSM - free space map for all tables or indexs to the pge which can be inserted it
+  - information about free space capacity
+  - all FSMs are stored with the suffix 'fsm' 
+
+**Commit log (clog)**
+
+- allocated in the shared memory and is used throughout transaction processing
+- transaction statuses: IN_PROGRESS, COMMITTED, ABORTED, and SUB_COMMITTED (has been committed to memory by the database management system, but has not yet been written to disk. This means that the changes made by the transaction are visible to other transactions and will be permanent once they are written to disk. However, in the event of a system failure, the changes may not be persisted)
+- The clog comprises one or more 8 KB pages in shared memory and logically forms an array.
+- The indices of the array correspond to the respective transaction ids, and each item in the array holds the status of the corresponding transaction id
+- When the current txid advances and the clog can no longer store it, a new page is appended
+- When PostgreSQL shuts down or whenever the checkpoint process runs, the data of the clog are written into files stored under the pg_xact subdirectory. And when PostgreSQL starts up files are loaded back to clog
+
+
+**Transaction snapshot**
+
+- a dataset that stored information about whether all transactions are active, at a certain point in time for an individual transaction
+- '100:104:100,102' - 99 transaction are inactive and 100 and above are active, 104 - first as-yet-unassigned txid, 100,102 - active txids at the moment of the snapshot and that means 101 and 103 are inactive
+- obtained snapshot for the visibility check, active transactions in the snapshot must be treated as in progress even if they have actually been committed or aborted.
+
+### 11. Vacuum Processing
+
+- main task is removal of dead tuples and freezing transaction ids
+- vacuum
+  - concurrent vacuum - removes dead tuples for each page of the table file
+    - remove dead tuples and defragment live tuples of each page, remove dead indexes
+    - freeze old txids of tuples if necessary, update frozen tixd releated to system catalogs, removal unnecessary parts of the clog 
+    - update FSM and VM of porcessed tables
+    - statistics update
+  - full vacuum - removes dead tuples and de-fragments live tuples
+  - autovacuum daemon was costly therefore visibility map was introduced to improve the efficiency and removal dead tuples
+
+### 12. Visibility map
+
+- reduces cost of vacuuming 
+- each table has an individual visibility map that holds the visibility of each page in the table file
+
+### 13. Freeze processing 
+
+- two modes lazy (typically) and eager
+- eager scans all pages regardless of whether each contains or not dead tuples, updates also catalogs to freeze
