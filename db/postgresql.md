@@ -357,7 +357,29 @@ pstree -p 9687
 
 ### 15. Index-only scans 
 
-- to reduce I/O costs it uses directly index without accessing corresponding table pages then all of the target entries of theselect are included in the index table 
+- to reduce I/O costs it uses directly index without accessing corresponding table pages then all of the target entries of the select are included in the index table 
 - at first glance that accessing the table pages is not required because the index tuples contain the necessary data. However, in fact, PostgreSQL has to check the visibility of the tuples in principle, and the index tuples do not have any information about transactions such as the t_xmin and t_xmax of the heap tuples. It uses visibility map to solve this dilemma
 
 ### 16. Buffer manager
+
+- transfers data between shared memory and persistent storage in effective way
+- comprises buffer table, descriptions and pool (file pages with indexes and tables plus freespace maps and visibility maps)
+  - buffer pool - array with slots for stroing data file pages (indices = buffer_ids), slot size = 8Kb like file page
+  - buffer descriptors - array of buffer descriptors, holds metadata of stored page in corresponding slot
+    - buffer_tag
+    - buffer_id
+    - refcount - the number of PostgreSQL processes currently accessing the associated stored page
+    - usage_count holds the number of times the associated stored page has been accessed since it was loaded into the corresponding buffer pool slot
+    - context_lock
+    - flags - dirty bit, valid bit, io_in_progress bit
+    - free next
+  - buffer table (BufferDesc)- hash table (like key-value, where value is slinked list of data entries) for storing relation between buffer_tags and buffer_ids
+- Indices of a buffer pool array are referred to as buffer_ids
+- buffer tat - relFileNode, fork number of the relation in which pahe belongs, and the block number of the page ({(16821, 16384, 37721), 0, 7}' - )
+
+- backend process reads page using buffer_tag asking buffer manager, if the page is not present in the pool buffer manager loads the page from the storage and finally return buffer_id
+- when the whole buffer is occupied but the requested page is not present there manager replaces one of pages in the buffer. Page replacement algorithm sellects victim page (engine uses clock sweep)
+
+**Locks**
+
+- buffer table lock - protects entire integrity of the buffer table
