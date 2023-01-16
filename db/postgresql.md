@@ -348,3 +348,16 @@ pstree -p 9687
 
 - two modes lazy (typically) and eager
 - eager scans all pages regardless of whether each contains or not dead tuples, updates also catalogs to freeze
+
+### 14. Heap Only Tuple (HOT)
+
+- for effectively usage of indexes and tables during the update of row if it is stored on the same page that stores old row
+- reduces a necessity of vacuum processing
+- in HOT postgresql does not insert corresponding index tuple 
+
+### 15. Index-only scans 
+
+- to reduce I/O costs it uses directly index without accessing corresponding table pages then all of the target entries of theselect are included in the index table 
+- at first glance that accessing the table pages is not required because the index tuples contain the necessary data. However, in fact, PostgreSQL has to check the visibility of the tuples in principle, and the index tuples do not have any information about transactions such as the t_xmin and t_xmax of the heap tuples. It uses visibility map to solve this dilemma
+
+### 16. Buffer manager
