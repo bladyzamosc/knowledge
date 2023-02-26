@@ -26,3 +26,5 @@ This is my private base with tips
 
 [Databases - postgresql](db/postgresql.md)
 
+[Azure](azure/azure.md)
+
