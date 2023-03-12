@@ -9,11 +9,14 @@
 
 Kubernetes is an orchestrator of cloud-native microservices applications.
 
+- containers cannot be deployed directly, because they not provide fault tolerance
+- containers cannot be deployed with optimum spot in the cluster
+
 ### 3. Cloud native
 
 - scale on demand 
 - self-heal
-- suppot zero-downtime tolling updates 
+- support zero-downtime tolling updates 
 - run anywhere that has Kubernetes - AWS, Azure, Linode, your on-premises datacenter, or even your Raspberry Pi cluster at home.
 
 ### 4. Masters and nodes 
@@ -34,8 +37,8 @@ Kubernetes is an orchestrator of cloud-native microservices applications.
 - kubectl exec -it nginx -- bash // start bash
 - kubectl delete pod nginx // killing pods
 - kubectl delete -f nginx.yaml // killing pods 
-- kubectl rollout undo deployment hellok8s
-
+- kubectl rollout undo deployment hello k8s
+- k3d cluster create mycluster
 
 ### 6. Pod
 
@@ -289,7 +292,7 @@ spec:
 - in the master they are encrypted 
 - reading a SECRET we are getting base64 encoded 
 - configMapKeyRef in ConfigMap and here secretKeyRef, secretRef
-- stringData - if we anoyed of base64
+- stringData - if we annoyed of base64
 - mounting similar like in ConfigMaps
 
 
